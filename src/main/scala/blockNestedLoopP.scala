@@ -74,19 +74,21 @@ val countdf=df.count().toInt
       var noCompared = 0
       var morethanonep = 0
       var morethanoner = 0
+      var record=0
+      var totalrecord=basicDfs.count().toInt
       //var lastrow=basicDfs.rdd.takeOrdered(1)(Ordering[Row].reverse)
       //      var bnlBuffferLength = bnlBuffer.length - 1
       val accUnnamed = new LongAccumulator
       val acc = ss.sparkContext.register(accUnnamed)
       def accChinaFunc(flight_row:Broadcast[ArrayBuffer[Row]],currentRow:Row): Broadcast[ArrayBuffer[Row]] = {
-        println("print apo to destroy")
+//        println("print apo to destroy")
         //        broadcastBuffer.destroy()
 
         //        if(flight_row.value.length>0) {
         //  flight_row.value.foreach(println)
-        println(" mapneis reeeeeeeeeeee")
+//        println(" mapneis reeeeeeeeeeee")
 
-        println("oel")
+//        println("oel")
 
         broadcastBuffer = flight_row
 
@@ -100,35 +102,38 @@ val countdf=df.count().toInt
         if(broadcastBuffer.value.length==0){
           broadcastBuffer.value+=x
           broadcastBuffer=accChinaFunc(broadcastBuffer,x)
-          broadcastBuffer.value.foreach(println)
+//          broadcastBuffer.value.foreach(println)
+          record+=1
         }else{
-          println("to epomeno point einai:",x)
+          record+=1
+          println("brisketai sthn egrafh" ,record)
+//          println("to epomeno point einai:",x)
           dominate=0
           dominated=0
           noCompared=0
           var bnl=0
           var point=x
           var neuralEqual=0
-          println("gia to anathema",broadcastBuffer.value.length)
-          println("pws einai to dominate",dominate)
-          println("pws einai to bnl",bnl)
+//          println("gia to anathema",broadcastBuffer.value.length)
+//          println("pws einai to dominate",dominate)
+//          println("pws einai to bnl",bnl)
           var minus=0
           while((bnl<=broadcastBuffer.value.length-1)&&dominate==0){
-            println("mpainei st while",broadcastBuffer.value(bnl))
+//            println("mpainei st while",broadcastBuffer.value(bnl))
             trueCounter=0
             falseCounter=0
             neuralEqual=0
 
             for(d<-0 to dimensions.toInt-1 ){
-              println("mpainei sto for")
+//              println("mpainei sto for")
               broadcastBuffer=accChinaFunc(broadcastBuffer,x)
               //to shmeio toy pinaka kanei dominate to shmeio tou dataframe
               if (broadcastBuffer.value(bnl).getDouble(d)<point.getDouble(d)){
 
                 trueCounter+=1
-                println("to trueCounter",trueCounter)
+//                println("to trueCounter",trueCounter)
                 if(trueCounter==dimensions.toInt ||trueCounter+neuralEqual==dimensions.toInt){
-                  println("petaei to simeio tou dataframe",x)
+//                  println("petaei to simeio tou dataframe",x)
                   dominate=1
                 }
               }
@@ -136,31 +141,31 @@ val countdf=df.count().toInt
 
                 falseCounter+=1
                 if(dominate==0 &&((neuralEqual!=0 && falseCounter+neuralEqual==dimensions.toInt)||(falseCounter==dimensions.toInt))) {
-                  println("nbl",bnl)
+//                  println("nbl",bnl)
                   broadcastBuffer.value -= broadcastBuffer.value(bnl)
                   broadcastBuffer = accChinaFunc(broadcastBuffer, point)
                   minus += 1
                   //                println("auto pu tha bgei",broadcastBuffer.value(bnl))
-                  println("upochfio gia na mpei",dominated)
-                  println("upochfio gia bufidia na mpei",broadcastBuffer.value.length)
+//                  println("upochfio gia na mpei",dominated)
+//                  println("upochfio gia bufidia na mpei",broadcastBuffer.value.length)
                 }
-                println("to falseCounter",falseCounter)
+//                println("to falseCounter",falseCounter)
               }else if(broadcastBuffer.value(bnl).getDouble(d)==point.getDouble(d)){
                 neuralEqual+=1
               }
 
               if(dominate==0 &&((neuralEqual!=0 && falseCounter+neuralEqual==dimensions.toInt)||(falseCounter==dimensions.toInt))){
-                println("upochfio gia na mpei",x)
+//                println("upochfio gia na mpei",x)
 
 
                 dominated+=1
 
               }
               else if(dominate==0 &&(trueCounter!=0 &&falseCounter!=0 &&(falseCounter+trueCounter+neuralEqual==dimensions.toInt||falseCounter+trueCounter==dimensions.toInt))){
-                println("upochfio gia noncompared na mpei",x)
+//                println("upochfio gia noncompared na mpei",x)
                 noCompared+=1
-                println("upochfio gia noncompared na mpei",noCompared)
-                println("upochfio gia noncomparedbuffer na mpei",broadcastBuffer.value.length)
+//                println("upochfio gia noncompared na mpei",noCompared)
+//                println("upochfio gia noncomparedbuffer na mpei",broadcastBuffer.value.length)
               }
             }
 
@@ -179,19 +184,19 @@ val countdf=df.count().toInt
               bnl += 1
 
             }
-            println("bnl poso einai", bnl)
+//            println("bnl poso einai", bnl)
           }
-          println("to noncompared einai",noCompared)
-          println("to broadcastBuffer.value.length-1",broadcastBuffer.value.length-1)
-          broadcastBuffer.value.foreach(println)
+//          println("to noncompared einai",noCompared)
+//          println("to broadcastBuffer.value.length-1",broadcastBuffer.value.length-1)
+//          broadcastBuffer.value.foreach(println)
           if(dominate==0 &&dominated==broadcastBuffer.value.length){
-            println("gioyxou mapeinei")
+//            println("gioyxou mapeinei")
             broadcastBuffer.value+=point
             broadcastBuffer=accChinaFunc(broadcastBuffer,point)
           }
           else if(dominate==0 && noCompared==broadcastBuffer.value.length){
 
-            println("den sigkrinetai")
+//            println("den sigkrinetai")
             broadcastBuffer.value+=point
             broadcastBuffer=accChinaFunc(broadcastBuffer,point)
           }
@@ -199,8 +204,11 @@ val countdf=df.count().toInt
             broadcastBuffer.value+=point
             broadcastBuffer=accChinaFunc(broadcastBuffer,point)
           }
-          println("ante kala", broadcastBuffer.value.length)
-          broadcastBuffer.value.foreach(println)
+//          println("ante kala", broadcastBuffer.value.length)
+          if(record==totalrecord){
+            broadcastBuffer.value.foreach(println)
+          }
+
 
         }
 
