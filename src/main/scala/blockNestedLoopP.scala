@@ -14,7 +14,7 @@ object blockNestedLoopP{
     val ss = SparkSession.builder().master(cores).appName("ask").getOrCreate()
     ss.sparkContext.setLogLevel("ERROR")
     import ss.implicits._
-    val inputFile = "./1000000anticorrelated.csv"
+    val inputFile = "1000000anticorrelated.csv"
     val data = ss.read.text(inputFile).as[String]
     val dfs = inputFile.flatMap(line => line.toString.split(" "))
     val words = data.flatMap(value => value.split("\\s+"))
