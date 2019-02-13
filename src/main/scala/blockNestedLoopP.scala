@@ -22,7 +22,7 @@ object blockNestedLoopP{
     val words = data.flatMap(value => value.split("\\s+"))
     val groupedWords = words.groupByKey(_.toLowerCase)
     val df = groupedWords.count()
-println("df",df.count())
+println("df",df.count().toInt)
     var basicDf = ss.read
       .option("header", "false")
       .csv(inputFile)
