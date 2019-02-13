@@ -8,10 +8,10 @@ import org.apache.spark.util.LongAccumulator
 import scala.collection.mutable.ArrayBuffer
 object blockNestedLoopP{
   def main(args: Array[String]): Unit = {
-//    var cores="local["+args(0)+"]"
+    var cores="local["+args(0)+"]"
     print("ekane to word count")
     Logger.getLogger("org").setLevel(Level.ERROR)
-    val ss = SparkSession.builder().master("local[*]").appName("ask").getOrCreate()
+    val ss = SparkSession.builder().master(cores).appName("ask").getOrCreate()
     ss.sparkContext.setLogLevel("ERROR")
     import ss.implicits._
     val inputFile = "1000000anticorrelated.csv"
@@ -90,7 +90,7 @@ object blockNestedLoopP{
 
       }
 
-      val Apo=basicDfs.rdd.repartition(6).map(x=>x)
+      val Apo=basicDfs.rdd.repartition(cores.toInt).map(x=>x)
 
         Apo.foreach(x=>
         if(broadcastBuffer.value.length==0){
