@@ -7,10 +7,10 @@ import org.apache.spark.util.LongAccumulator
 import scala.collection.mutable.ArrayBuffer
 object blockNestedLoopP{
   def main(args: Array[String]): Unit = {
-    var cores="local["+args(0)+"]"
-    var partition=args(0).toInt
-//var cores="local[*]"
-//    var partition=6
+//    var cores="local["+args(0)+"]"
+//    var partition=args(0).toInt
+var cores="local[*]"
+    var partition=6
     print("ekane to word count")
     Logger.getLogger("org").setLevel(Level.ERROR)
     val ss = SparkSession.builder().master(cores).appName("ask").getOrCreate()
@@ -204,10 +204,10 @@ val countdf=df.count().toInt
             broadcastBuffer.value+=point
             broadcastBuffer=accChinaFunc(broadcastBuffer,point)
           }
-//          println("ante kala", broadcastBuffer.value.length)
-          if(record==totalrecord){
-            broadcastBuffer.value.foreach(println)
-          }
+          println("ante kala", broadcastBuffer.value.length)
+//          if(record==totalrecord){
+//            broadcastBuffer.value.foreach(println)
+//          }
 
 
         }
