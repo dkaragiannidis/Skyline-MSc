@@ -8,7 +8,7 @@ import org.apache.spark.util.LongAccumulator
 import scala.collection.mutable.ArrayBuffer
 object blockNestedLoopP{
   def main(args: Array[String]): Unit = {
-    var cores=args(0)
+    var cores=args(0).toInt
     print("ekane to word count")
     Logger.getLogger("org").setLevel(Level.ERROR)
     val ss = SparkSession.builder().master("local["+cores+"]").appName("ask").getOrCreate()
