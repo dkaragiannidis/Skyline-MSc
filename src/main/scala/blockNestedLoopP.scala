@@ -24,13 +24,13 @@ object blockNestedLoopP{
     var basicDf = ss.read
       .option("header", "false")
       .csv(inputFile)
-
+val dfCount=df.count()
     print("pira ta arxeia")
     basicDf.printSchema()
     basicDf.show()
     val count = basicDf.count()
     print("count", count)
-    var dimensions = ((df.count() - 1) / count) + 1
+    var dimensions = ((dfCount.toInt - 1) / count.toInt) + 1
     print("dimensions", dimensions)
     basicDf = basicDf.withColumn("temp", split(col("_c0"), "\\ ")).select(
       (0 until dimensions.toInt).map(i => col("temp").getItem(i).as(s"col$i").cast(DoubleType)): _*)
