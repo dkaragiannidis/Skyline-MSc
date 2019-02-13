@@ -8,9 +8,10 @@ import org.apache.spark.util.LongAccumulator
 import scala.collection.mutable.ArrayBuffer
 object blockNestedLoopP{
   def main(args: Array[String]): Unit = {
-    var cores="local["+args(0)+"]"
-    var partition=args(0).toInt
-//var cores="local[*]"
+//    var cores="local["+args(0)+"]"
+//    var partition=args(0).toInt
+var cores="local[*]"
+    var partition=6
     print("ekane to word count")
     Logger.getLogger("org").setLevel(Level.ERROR)
     val ss = SparkSession.builder().master(cores).appName("ask").getOrCreate()
@@ -22,7 +23,8 @@ object blockNestedLoopP{
     val words = data.flatMap(value => value.split("\\s+"))
     val groupedWords = words.groupByKey(_.toLowerCase)
     val df = groupedWords.count()
-println("df",df.count().toInt)
+val countdf=df.count().toInt
+println("df",countdf)
     var basicDf = ss.read
       .option("header", "false")
       .csv(inputFile)
@@ -32,11 +34,11 @@ println("df",df.count().toInt)
     basicDf.show()
     val count = basicDf.count()
     print("count", count)
-    var dimensions = ((df.count().toInt) / count.toInt)
+    var dimensions = countdf / count.toInt
 
     print("dimensions", dimensions)
     basicDf = basicDf.withColumn("temp", split(col("_c0"), "\\ ")).select(
-      (0 until dimensions.toInt).map(i => col("temp").getItem(i).as(s"col$i").cast(DoubleType)): _*)
+      (0 until dimensions).map(i => col("temp").getItem(i).as(s"col$i").cast(DoubleType)): _*)
     println("meta  ton xwrismo")
     basicDf.printSchema()
     basicDf.show()
@@ -56,7 +58,7 @@ println("df",df.count().toInt)
     }
 
 
-    timebasicdf(Skyline(basicDf,dimensions.toInt))
+    timebasicdf(Skyline(basicDf,dimensions))
     //    println("ksekinaei o sfsssssssssssssssssssssssssssssssssssssssssssssssssssssssss")
     //  timebasicdf(Skyline(SfsData,dimensions.toInt))
     def Skyline(basicDfs: DataFrame, dimensions: Int) = {
