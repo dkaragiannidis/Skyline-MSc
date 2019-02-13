@@ -4,7 +4,6 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DoubleType
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.util.LongAccumulator
-
 import scala.collection.mutable.ArrayBuffer
 object blockNestedLoopP{
   def main(args: Array[String]): Unit = {
