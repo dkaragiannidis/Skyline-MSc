@@ -8,15 +8,15 @@ import org.apache.spark.util.LongAccumulator
 import scala.collection.mutable.ArrayBuffer
 object blockNestedLoopP{
   def main(args: Array[String]): Unit = {
-    var cores="local["+args(0)+"]"
+//    var cores="local["+args(0)+"]"
     print("ekane to word count")
     Logger.getLogger("org").setLevel(Level.ERROR)
-    val ss = SparkSession.builder().master(cores).appName("ask").getOrCreate()
+    val ss = SparkSession.builder().master("local[*]").appName("ask").getOrCreate()
     ss.sparkContext.setLogLevel("ERROR")
     import ss.implicits._
     val inputFile = "1000000anticorrelated.csv"
     val data = ss.read.text(inputFile).as[String]
-    val dfs = inputFile.flatMap(line => line.toString.split(" "))
+//    val dfs = inputFile.flatMap(line => line.toString.split(" "))
     val words = data.flatMap(value => value.split("\\s+"))
     val groupedWords = words.groupByKey(_.toLowerCase)
     val df = groupedWords.count()
@@ -37,7 +37,20 @@ object blockNestedLoopP{
     println("meta  ton xwrismo")
     basicDf.printSchema()
     basicDf.show()
-
+    var maxtimedf=0
+    var totalTimebasicDf=0
+    def timebasicdf[R](block: => R): R = {
+      val t0 = System.nanoTime()
+      val result = block    // call-by-name
+      val t1 = System.nanoTime()
+      if(maxtimedf<(t1 - t0)){
+        maxtimedf=t1.toInt - t0.toInt
+      }
+      totalTimebasicDf=totalTimebasicDf+(t1.toInt - t0.toInt)
+      println("Elapsed time basicdf: " + (t1 - t0)/100000000 + "ns")
+      //    print("maxbasicdf:", maxtimedf)
+      result
+    }
 
 
     timebasicdf(Skyline(basicDf,dimensions.toInt))
@@ -77,7 +90,7 @@ object blockNestedLoopP{
 
       }
 
-      val Apo=basicDfs.rdd.repartition(cores.toInt).map(x=>x)
+      val Apo=basicDfs.rdd.repartition(6).map(x=>x)
 
         Apo.foreach(x=>
         if(broadcastBuffer.value.length==0){
@@ -191,19 +204,7 @@ object blockNestedLoopP{
       print(Apo)
 
 
-    }}
-  var maxtimedf=0
-  var totalTimebasicDf=0
-  def timebasicdf[R](block: => R): R = {
-    val t0 = System.nanoTime()
-    val result = block    // call-by-name
-    val t1 = System.nanoTime()
-    if(maxtimedf<(t1 - t0)){
-      maxtimedf=t1.toInt - t0.toInt
     }
-    totalTimebasicDf=totalTimebasicDf+(t1.toInt - t0.toInt)
-    println("Elapsed time basicdf: " + (t1 - t0)/100000000 + "ns")
-    //    print("maxbasicdf:", maxtimedf)
-    result
+
   }
 }
