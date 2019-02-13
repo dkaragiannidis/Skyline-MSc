@@ -24,7 +24,7 @@ object blockNestedLoopP{
     val groupedWords = words.groupByKey(_.toLowerCase)
     val df = groupedWords.count()
 val countdf=df.count().toInt
-println("df",countdf)
+//println("df",countdf)
     var basicDf = ss.read
       .option("header", "false")
       .csv(inputFile)
