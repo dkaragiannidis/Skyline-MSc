@@ -4,26 +4,26 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DoubleType
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.util.LongAccumulator
+
 import scala.collection.mutable.ArrayBuffer
 object blockNestedLoopP{
   def main(args: Array[String]): Unit = {
-//   var cores="local["+args(0)+"]"
-//    var partition=args(0).toInt
-var cores="local[*]"
-    var partition=6
-    print("ekane to word count")
+    //    print("ekane to word count")
+       var cores="local["+args(0)+"]"
+        var partition=args(0).toInt
+//    var cores="local[*]"
+//    var partition=6
     Logger.getLogger("org").setLevel(Level.ERROR)
     val ss = SparkSession.builder().master(cores).appName("ask").getOrCreate()
     ss.sparkContext.setLogLevel("ERROR")
     import ss.implicits._
-    val inputFile = "uniform1000000d10.csv"
+    val inputFile = "δατα.csv"
     val data = ss.read.text(inputFile).as[String]
-//    val dfs = inputFile.flatMap(line => line.toString.split(" "))
+    val dfs = inputFile.flatMap(line => line.toString.split(" "))
     val words = data.flatMap(value => value.split("\\s+"))
     val groupedWords = words.groupByKey(_.toLowerCase)
     val df = groupedWords.count()
-val countdf=df.count().toInt
-//println("df",countdf)
+
     var basicDf = ss.read
       .option("header", "false")
       .csv(inputFile)
@@ -33,33 +33,16 @@ val countdf=df.count().toInt
     basicDf.show()
     val count = basicDf.count()
     print("count", count)
-    var dimensions = countdf / count.toInt
-
+    var dimensions = ((df.count() - 1) / count) + 1
     print("dimensions", dimensions)
     basicDf = basicDf.withColumn("temp", split(col("_c0"), "\\ ")).select(
-      (0 until dimensions).map(i => col("temp").getItem(i).as(s"col$i").cast(DoubleType)): _*)
+      (0 until dimensions.toInt).map(i => col("temp").getItem(i).as(s"col$i").cast(DoubleType)): _*)
     println("meta  ton xwrismo")
     basicDf.printSchema()
     basicDf.show()
-    var maxtimedf=0
-    var totalTimebasicDf=0
-    def timebasicdf[R](block: => R): R = {
-      val t0 = System.nanoTime()
-      val result = block    // call-by-name
-      val t1 = System.nanoTime()
-      if(maxtimedf<(t1 - t0)){
-        maxtimedf=t1.toInt - t0.toInt
-      }
-      totalTimebasicDf=totalTimebasicDf+(t1.toInt - t0.toInt)
-      println("Elapsed time basicdf: " + (t1 - t0)/100000000 + "ns")
-      //    print("maxbasicdf:", maxtimedf)
-      result
-    }
 
-
-    timebasicdf(Skyline(basicDf,dimensions))
-    //    println("ksekinaei o sfsssssssssssssssssssssssssssssssssssssssssssssssssssssssss")
-    //  timebasicdf(Skyline(SfsData,dimensions.toInt))
+    println("ksekinaei o bnl")
+    timebasicdf(Skyline(basicDf,dimensions.toInt))
     def Skyline(basicDfs: DataFrame, dimensions: Int) = {
       var start = true
       var bnlBuffer: ArrayBuffer[Row] = ArrayBuffer()
@@ -205,7 +188,19 @@ val countdf=df.count().toInt
       print(Apo)
 
 
+    }}
+  var maxtimedf=0
+  var totalTimebasicDf=0
+  def timebasicdf[R](block: => R): R = {
+    val t0 = System.nanoTime()
+    val result = block    // call-by-name
+    val t1 = System.nanoTime()
+    if(maxtimedf<(t1 - t0)){
+      maxtimedf=t1.toInt - t0.toInt
     }
-
+    totalTimebasicDf=totalTimebasicDf+(t1.toInt - t0.toInt)
+    println("Elapsed time basicdf: " + (t1 - t0)/100000000 + "ns")
+    //    print("maxbasicdf:", maxtimedf)
+    result
   }
 }
