@@ -9,15 +9,15 @@ import scala.collection.mutable.ArrayBuffer
 object Sfs{
   def main(args: Array[String]): Unit = {
 //    print("ekane to word count")
-   var cores="local["+args(0)+"]"
-    var partition=args(0).toInt
-//var cores="local[*]"
-//    var partition=6
+//   var cores="local["+args(0)+"]"
+//    var partition=args(0).toInt
+var cores="local[*]"
+    var partition=6
     Logger.getLogger("org").setLevel(Level.ERROR)
     val ss = SparkSession.builder().master(cores).appName("ask").getOrCreate()
     ss.sparkContext.setLogLevel("ERROR")
     import ss.implicits._
-    val inputFile = "1000000anticorrelated.csv"
+    val inputFile = "uniform1000000d10.csv"
     val data = ss.read.text(inputFile).as[String]
     val dfs = inputFile.flatMap(line => line.toString.split(" "))
     val words = data.flatMap(value => value.split("\\s+"))
