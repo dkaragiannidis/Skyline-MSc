@@ -8,12 +8,16 @@ import org.apache.spark.util.LongAccumulator
 import scala.collection.mutable.ArrayBuffer
 object Sfs{
   def main(args: Array[String]): Unit = {
-    print("ekane to word count")
+//    print("ekane to word count")
+   var cores="local["+args(0)+"]"
+    var partition=args(0).toInt
+//var cores="local[*]"
+//    var partition=6
     Logger.getLogger("org").setLevel(Level.ERROR)
-    val ss = SparkSession.builder().master("local[*]").appName("ask").getOrCreate()
+    val ss = SparkSession.builder().master(cores).appName("ask").getOrCreate()
     ss.sparkContext.setLogLevel("ERROR")
     import ss.implicits._
-    val inputFile = "./anticorreleated55000.csv"
+    val inputFile = "1000000anticorrelated.csv"
     val data = ss.read.text(inputFile).as[String]
     val dfs = inputFile.flatMap(line => line.toString.split(" "))
     val words = data.flatMap(value => value.split("\\s+"))
@@ -63,46 +67,32 @@ object Sfs{
       var noCompared = 0
       var morethanonep = 0
       var morethanoner = 0
-      //var lastrow=basicDfs.rdd.takeOrdered(1)(Ordering[Row].reverse)
-      //      var bnlBuffferLength = bnlBuffer.length - 1
+     var record =0
       val accUnnamed = new LongAccumulator
       val acc = ss.sparkContext.register(accUnnamed)
       def accChinaFunc(flight_row:Broadcast[ArrayBuffer[Row]],currentRow:Row): Broadcast[ArrayBuffer[Row]] = {
-        println("print apo to destroy")
-        //        broadcastBuffer.destroy()
+//        println("print apo to destroy")
+//
+//        println(" mapneis reeeeeeeeeeee")
+//
+//        println("oel")
 
-        //        if(flight_row.value.length>0) {
-        //  flight_row.value.foreach(println)
-        println(" mapneis reeeeeeeeeeee")
-
-        println("oel")
-        //  destination=flight_row.map(x=>x)collect{case r:Row=>r}
-        //    broadcastBuffer.destroy()
-        //  broadcastBuffer = ss.sparkContext.broadcast(destination)
-        //  flight_row.value=flight_row.value.distinct
         broadcastBuffer = flight_row
-        //  broadcastBuffer.value.foreach(println)
+
         return broadcastBuffer
-        //  return destination
-        //        }else{return flight_row}
-        //else {
-        //println("giati mapneis reeeeeeeeeeee")
-        //  broadcastBuffer.value+=currentRow
-        //  broadcastBuffer.value+=point
-        //  broadcastBuffer = ss.sparkContext.broadcast(destination)
-        //  return broadcastBuffer
-        //  destination=destination.collect{case r:Row=>r}
-        //  return destination
-        //}
+
       }
 
-      val Apo=basicDfs.rdd.repartition(6).map(x=>x).foreach(x=>
+      val Apo=basicDfs.rdd.repartition(partition).map(x=>x).foreach(x=>
         if(broadcastBuffer.value.length==0){
           broadcastBuffer.value+=x
           broadcastBuffer=accChinaFunc(broadcastBuffer,x)
-          broadcastBuffer.value.foreach(println)
+//          broadcastBuffer.value.foreach(println)
+          record+=1
         }else{
-          println("to epomeno point einai:",x)
+          record+=1
+          println("eimaste stin eggrafi",record)
+//          println("to epomeno point einai:",x)
           dominate=0
           dominated=0
           noCompared=0
@@ -110,8 +100,8 @@ object Sfs{
           var point=x
           var neuralEqual=0
           println("gia to anathema",broadcastBuffer.value.length)
-          println("pws einai to dominate",dominate)
-          println("pws einai to bnl",bnl)
+//          println("pws einai to dominate",dominate)
+//          println("pws einai to bnl",bnl)
           var minus=0
           while((bnl<=broadcastBuffer.value.length-1)&&dominate==0){
             println("mpainei st while",broadcastBuffer.value(bnl))
@@ -126,9 +116,9 @@ object Sfs{
               if (broadcastBuffer.value(bnl).getDouble(d)<point.getDouble(d)){
 
                 trueCounter+=1
-                println("to trueCounter",trueCounter)
+//                println("to trueCounter",trueCounter)
                 if(trueCounter==dimensions.toInt ||trueCounter+neuralEqual==dimensions.toInt){
-                  println("petaei to simeio tou dataframe",x)
+//                  println("petaei to simeio tou dataframe",x)
                   dominate=1
                 }
               }
@@ -141,7 +131,7 @@ object Sfs{
                   broadcastBuffer = accChinaFunc(broadcastBuffer, point)
                   minus += 1
                   //                println("auto pu tha bgei",broadcastBuffer.value(bnl))
-                  println("upochfio gia na mpei",dominated)
+//                  println("upochfio gia na mpei",dominated)
                   println("upochfio gia bufidia na mpei",broadcastBuffer.value.length)
                 }
                 println("to falseCounter",falseCounter)
@@ -150,23 +140,20 @@ object Sfs{
               }
 
               if(dominate==0 &&((neuralEqual!=0 && falseCounter+neuralEqual==dimensions.toInt)||(falseCounter==dimensions.toInt))){
-                println("upochfio gia na mpei",x)
+//                println("upochfio gia na mpei",x)
 
 
                 dominated+=1
 
               }
               else if(dominate==0 &&(trueCounter!=0 &&falseCounter!=0 &&(falseCounter+trueCounter+neuralEqual==dimensions.toInt||falseCounter+trueCounter==dimensions.toInt))){
-                println("upochfio gia noncompared na mpei",x)
+//                println("upochfio gia noncompared na mpei",x)
                 noCompared+=1
-                println("upochfio gia noncompared na mpei",noCompared)
-                println("upochfio gia noncomparedbuffer na mpei",broadcastBuffer.value.length)
+//                println("upochfio gia noncompared na mpei",noCompared)
+//                println("upochfio gia noncomparedbuffer na mpei",broadcastBuffer.value.length)
               }
             }
-            //          breakable{
-            //                    if(dominate ==1)break
-            //                    //          efCounter=eliminationFilterBufferLength
-            //                  }
+
             if (minus != 0) {
               if (minus > bnl) {
 
@@ -182,11 +169,11 @@ object Sfs{
               bnl += 1
 
             }
-            println("bnl poso einai", bnl)
+//            println("bnl poso einai", bnl)
           }
-          println("to noncompared einai",noCompared)
+//          println("to noncompared einai",noCompared)
           println("to broadcastBuffer.value.length-1",broadcastBuffer.value.length-1)
-          broadcastBuffer.value.foreach(println)
+//          broadcastBuffer.value.foreach(println)
           if(dominate==0 &&dominated==broadcastBuffer.value.length){
             println("gioyxou mapeinei")
             broadcastBuffer.value+=point
@@ -203,7 +190,7 @@ object Sfs{
             broadcastBuffer=accChinaFunc(broadcastBuffer,point)
           }
           println("ante kala", broadcastBuffer.value.length)
-          broadcastBuffer.value.foreach(println)
+//          broadcastBuffer.value.foreach(println)
 
         }
 
