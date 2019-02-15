@@ -98,7 +98,7 @@ object Sfs{
 
       }
 
-      basicDfs2=basicDfs2.repartition(6)
+      basicDfs2=basicDfs2.repartition(partition)
       basicDfs2.count()
       println( "",basicDfs2.rdd.getNumPartitions)
       val da=basicDfs2.rdd.map(x=> {
